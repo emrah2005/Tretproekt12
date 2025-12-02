@@ -1,0 +1,157 @@
+================================================================================
+INFLUENTIA - COMPLETE LARAVEL IMPLEMENTATION GUIDE
+================================================================================
+
+To complete setup, follow these steps locally:
+
+1. Pull the latest changes
+2. Copy each file code below into app/Models/, database/migrations/, app/Http/Controllers/Api/
+3. Create routes/api.php with routes below
+4. Run: php artisan migrate
+5. Test on localhost
+
+================================================================================
+REMAINING MIGRATIONS (5-10)
+================================================================================
+
+--- File: database/migrations/2025_12_02_000005_create_offers_table.php ---
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('offers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignId('influencer_id')->constrained('users')->onDelete('cascade');
+            $table->decimal('proposed_rate', 12, 2);
+            $table->enum('status', ['proposed', 'counter', 'accepted', 'rejected'])->default('proposed');
+            $table->text('notes')->nullable();
+            $table->timestamps();
+            $table->index(['campaign_id', 'influencer_id']);
+        });
+    }
+    public function down(): void { Schema::dropIfExists('offers'); }
+};
+
+--- File: database/migrations/2025_12_02_000006_create_threads_table.php ---
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('threads', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignId('brand_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('influencer_id')->constrained('users')->onDelete('cascade');
+            $table->string('subject');
+            $table->timestamps();
+            $table->index(['campaign_id', 'brand_id', 'influencer_id']);
+        });
+    }
+    public function down(): void { Schema::dropIfExists('threads'); }
+};
+
+--- File: database/migrations/2025_12_02_000007_create_messages_table.php ---
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('messages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('thread_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+            $table->text('content');
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
+            $table->index('thread_id');
+        });
+    }
+    public function down(): void { Schema::dropIfExists('messages'); }
+};
+
+--- File: database/migrations/2025_12_02_000008_create_deliverables_table.php ---
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('deliverables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignId('influencer_id')->constrained('users')->onDelete('cascade');
+            $table->string('title');
+            $table->text('description');
+            $table->string('url')->nullable();
+            $table->enum('status', ['pending', 'submitted', 'approved', 'rejected'])->default('pending');
+            $table->timestamp('submitted_at')->nullable();
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamps();
+            $table->index('campaign_id');
+        });
+    }
+    public function down(): void { Schema::dropIfExists('deliverables'); }
+};
+
+--- File: database/migrations/2025_12_02_000009_create_ratings_table.php ---
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('ratings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignId('rater_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('ratee_id')->constrained('users')->onDelete('cascade');
+            $table->integer('score')->min(1)->max(5);
+            $table->text('review')->nullable();
+            $table->timestamps();
+            $table->index(['campaign_id', 'rater_id', 'ratee_id']);
+        });
+    }
+    public function down(): void { Schema::dropIfExists('ratings'); }
+};
+
+--- File: database/migrations/2025_12_02_000010_create_payments_table.php ---
+
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+return new class extends Migration {
+    public function up(): void {
+        Schema::create('payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('campaign_id')->constrained()->onDelete('cascade');
+            $table->foreignId('influencer_id')->constrained('users')->onDelete('cascade');
+            $table->decimal('amount', 12, 2);
+            $table->enum('status', ['pending', 'escrow_held', 'released', 'failed'])->default('pending');
+            $table->string('transaction_id')->nullable();
+            $table->timestamp('escrow_released_at')->nullable();
+            $table->timestamps();
+            $table->index('campaign_id');
+        });
+    }
+    public function down(): void { Schema::dropIfExists('payments'); }
+};
+
+================================================================================
+All models are in app/Models/ - already created above
+All controllers go in app/Http/Controllers/Api/
+All routes go in routes/api.php
+================================================================================
+
+READY TO PULL AND COMPLETE LOCALLY!
