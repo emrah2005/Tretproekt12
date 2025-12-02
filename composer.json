@@ -1,0 +1,6 @@
+{
+    "require": {
+        "laravel/sanctum": "^4.2",
+        "laravel/tinker": "^2.10"
+    }
+}
